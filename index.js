@@ -1,34 +1,11 @@
-const { read } = require('fs');
-const { Configuration, OpenAIApi } = require('openai');
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3333;
 require('dotenv').config();
-const readline = require('readline');
 
-const openai = new OpenAIApi(
-  new Configuration({
-    apiKey: process.env.API_KEY,
-  })
-);
+const chatRoutes = require('./routes/chatRoutes');
+app.use('/chat', chatRoutes);
 
-const userInterface = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
+app.listen(port, () => {
+  console.log(`${process.env.API_NAME} running on port: ${port}`);
 });
-
-userInterface.prompt();
-userInterface.on('line', async (input) => {
-  const res = await openai.createChatCompletion({
-    model: 'gpt-3.5-turbo',
-    messages: [{ role: 'user', content: 'Hello chatGPT' }],
-  });
-  console.log(res.data.choices[0].message.content);
-  userInterface.prompt()
-});
-
-openai
-  .createChatCompletion({
-    model: 'gpt-3.5-turbo',
-    messages: [{ role: 'user', content: 'Hello chatGPT' }],
-  })
-  .then((res) => {
-    console.log(res.data.choices[0].message.content);
-  });
